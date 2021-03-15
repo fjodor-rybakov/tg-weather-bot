@@ -1,0 +1,19 @@
+{
+  "properties": [
+    {
+      "name": "telegram.token",
+      "type": "java.lang.String",
+      "description": "Telegram bot token."
+    },
+    {
+      "name": "telegram.bot-name",
+      "type": "java.lang.String",
+      "description": "Telegram bot name."
+    },
+    {
+      "name": "telegram.command-prefix",
+      "type": "java.lang.String",
+      "description": "Command prefix."
+    }
+  ]
+}
