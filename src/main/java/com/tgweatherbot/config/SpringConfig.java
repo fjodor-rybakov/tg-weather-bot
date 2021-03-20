@@ -1,6 +1,7 @@
 package com.tgweatherbot.config;
 
 import com.tgweatherbot.bot.WeatherBot;
+import com.tgweatherbot.bot.handlers.MarkupCommandHandler;
 import com.tgweatherbot.bot.handlers.StartCommandHandler;
 import com.tgweatherbot.bot.handlers.SubToWeatherCommandHandler;
 import com.tgweatherbot.bot.handlers.UnknownCommandHandler;
@@ -39,6 +40,11 @@ public class SpringConfig {
     @Bean
     public ICommandHandler getSubToWeatherCommandHandler() {
         return new SubToWeatherCommandHandler();
+    }
+
+    @Bean
+    public ICommandHandler getMarkupCommandHandler() {
+        return new MarkupCommandHandler();
     }
 
     @PostConstruct

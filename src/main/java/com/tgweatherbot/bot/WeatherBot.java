@@ -8,10 +8,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
-import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
+
+import javax.annotation.PostConstruct;
+import java.util.HashMap;
 
 @Component
 public class WeatherBot extends TelegramLongPollingBot {
@@ -21,6 +23,13 @@ public class WeatherBot extends TelegramLongPollingBot {
     private String botName;
     @Value("${telegram.command-prefix}")
     private String commandPrefix;
+    @Value("${telegram.start-command}")
+    private String startCommand;
+    @Value("${telegram.sub-to-weather-command}")
+    private String subToWeatherCommand;
+    @Value("${telegram.keyboard-command:}")
+    private String keyboardCommand;
+
     private final Logger logger = LoggerFactory.getLogger(WeatherBot.class);
     @Autowired
     private Helper helper;
@@ -30,6 +39,15 @@ public class WeatherBot extends TelegramLongPollingBot {
     private ICommandHandler subToWeatherCommandHandler;
     @Autowired
     private ICommandHandler unknownCommandHandler;
+    @Autowired
+    private ICommandHandler markupCommandHandler;
+
+    private HashMap<String, ICommandHandler> commandHandlerList;
+
+    @PostConstruct
+    private void init() {
+        initCommand();
+    }
 
     @Override
     public String getBotUsername() {
@@ -58,12 +76,11 @@ public class WeatherBot extends TelegramLongPollingBot {
     private void handleIncomingMessage(Message message) {
         var messageText = message.getText();
         if (helper.messageIsCommand(messageText, commandPrefix)) {
-            SendMessage sendMessage;
-            sendMessage = switch (helper.getCommand(messageText, commandPrefix.length())) {
-                case "start" -> startCommandHandler.handle(message);
-                case "subToWeather" -> subToWeatherCommandHandler.handle(message);
-                default -> unknownCommandHandler.handle(message);
-            };
+            var currentCommand = helper.getCommand(messageText, commandPrefix.length());
+            var commandHandler = commandHandlerList.get(currentCommand);
+            var sendMessage = commandHandler == null ?
+                    unknownCommandHandler.handle(message) : commandHandler.handle(message);
+
             if (sendMessage != null) {
                 try {
                     execute(sendMessage);
@@ -72,5 +89,13 @@ public class WeatherBot extends TelegramLongPollingBot {
                 }
             }
         }
+    }
+
+    private void initCommand() {
+        var hashMap = new HashMap<String, ICommandHandler>();
+        hashMap.put(startCommand, startCommandHandler);
+        hashMap.put(subToWeatherCommand, subToWeatherCommandHandler);
+        hashMap.put(keyboardCommand, markupCommandHandler);
+        commandHandlerList = hashMap;
     }
 }

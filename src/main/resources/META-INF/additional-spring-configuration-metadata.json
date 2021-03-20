@@ -14,6 +14,21 @@
       "name": "telegram.command-prefix",
       "type": "java.lang.String",
       "description": "Command prefix."
+    },
+    {
+      "name": "telegram.start-command",
+      "type": "java.lang.String",
+      "description": "Command name for start greeting."
+    },
+    {
+      "name": "telegram.sub-to-weather-command",
+      "type": "java.lang.String",
+      "description": "Command name for subscribe to weather notification."
+    },
+    {
+      "name": "telegram.keyboard-command",
+      "type": "java.lang.String",
+      "description": "Command name for get keyboard."
     }
   ]
 }
